@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center py-5">
+  <h1>Chicken Droppings Disease Detector</h1>
+  <p class="lead">Upload a photo of chicken droppings to detect possible diseases.</p>
+  <a class="btn btn-primary btn-lg" href="{{ url_for('upload') }}">Upload Image</a>
+  <a class="btn btn-secondary btn-lg" href="{{ url_for('history') }}">View History</a>
+</div>
+{% endblock %}

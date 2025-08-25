@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Inference History</h2>
+{% if records %}
+  <table class="table table-striped mt-3">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Filename</th>
+        <th>Prediction</th>
+        <th>Confidence</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in records %}
+      <tr>
+        <td>{{ r.timestamp }}</td>
+        <td>{{ r.filename }}</td>
+        <td>{{ r.prediction }}</td>
+        <td>{{ "%.2f"|format(r.confidence) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No inferences yet.</p>
+{% endif %}
+{% endblock %}
