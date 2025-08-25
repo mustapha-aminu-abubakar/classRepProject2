@@ -1,28 +1,37 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Inference History</h2>
-{% if records %}
-  <table class="table table-striped mt-3">
-    <thead>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inference History</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container py-4">
+  <h2 class="mb-4">Inference History</h2>
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
       <tr>
-        <th>Timestamp</th>
+        <th>ID</th>
         <th>Filename</th>
-        <th>Prediction</th>
+        <th>Predicted Label</th>
         <th>Confidence</th>
+        <th>Timestamp</th>
       </tr>
     </thead>
     <tbody>
       {% for r in records %}
       <tr>
-        <td>{{ r.timestamp }}</td>
+        <td>{{ r.id }}</td>
         <td>{{ r.filename }}</td>
-        <td>{{ r.prediction }}</td>
-        <td>{{ "%.2f"|format(r.confidence) }}</td>
+        <td>{{ r.label }}</td>
+        <td>{{ "%.2f" | format(r.confidence * 100) }}%</td>
+        <td>{{ r.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5" class="text-center">No inference history yet.</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-{% else %}
-  <p>No inferences yet.</p>
-{% endif %}
-{% endblock %}
+</body>
+</html>

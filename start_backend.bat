@@ -1,9 +1,0 @@
-@echo off
-echo Starting Chicken Disease Detection Backend...
-echo.
-echo Installing dependencies...
-pip install -r requirements.txt
-echo.
-echo Starting FastAPI server...
-python main.py
-pause
