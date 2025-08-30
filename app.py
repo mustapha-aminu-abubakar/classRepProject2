@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from werkzeug.utils import secure_filename
 from PIL import Image
 import torch
@@ -99,45 +99,42 @@ def infer_image(pil_img: Image.Image):
 
 
 # --- Routes ---
-@app.route("/")
-def index():
-    return redirect(url_for("upload"))
 
-
-@app.route("/upload", methods=["GET", "POST"])
 def upload():
-    global _model
-    if _model == None:
-        bootstrap()
-    if request.method == "POST":
-        print(request.files)
-        if "file" not in request.files:
-            return "No file part", 400
-        file = request.files["file"]
-        if file.filename == "":
-            return "No selected file", 400
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-            file.save(save_path)
+    try:
+        global _model
+        if _model == None:
+            bootstrap()
+        if request.method == "POST":
+            print(request.files)
+            if "file" not in request.files:
+                return "No file part", 400
+            file = request.files["file"]
+            if file.filename == "":
+                return "No selected file", 400
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                file.save(save_path)
 
-            pil_img = Image.open(save_path)
-            label, confidence = infer_image(pil_img)
-            
-            # Save to DB
-            save_inference(filename, label, confidence)
-            
-            return render_template("result.html",
-                                   filename=filename,
-                                   label=label,
-                                   confidence=confidence)
-    return render_template("upload.html")
+                pil_img = Image.open(save_path)
+                label, confidence = infer_image(pil_img)
+                
+                # Save to DB
+                save_inference(filename, label, confidence)
+
+                return jsonify({"message": "success", "filename": filename, "label": label, "confidence": confidence})
+                
+    except Exception as e:
+        print(f"Error during upload: {e}")
+        return jsonify({"message": "error", "details": str(e)})
+
+    return 
 
 
-@app.route("/history")
 def history():
     records = Inference.query.order_by(Inference.timestamp.desc()).all()
-    return render_template("history.html", records=records)
+    return jsonify({"history": [{"filename": r.filename, "label": r.label, "confidence": r.confidence, "timestamp": r.timestamp} for r in records]})
 
 
 
